@@ -31,6 +31,10 @@ export function NavUser() {
 
   const { data, error, isLoading } = useGetMeQuery({ skip: !token }) as any;
 
+
+  console.log(data, "data");
+
+
   const router = useRouter();
   const pathname = usePathname();
 
