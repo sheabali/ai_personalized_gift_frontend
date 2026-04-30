@@ -1,6 +1,6 @@
 import NextAuthSessionProvider from "@/lib/NextAuthSessionProvider";
 import ReduxProvider from "@/redux/ReduxProvider";
-import { SocketProvider } from "@/components/providers/SocketContext";
+
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import { Toaster } from "sonner";
@@ -26,9 +26,7 @@ export default function RootLayout({
       <body className={`${roboto.className} antialiased`}>
         <Toaster position="top-center" richColors />
         <NextAuthSessionProvider>
-          <ReduxProvider>
-            <SocketProvider>{children}</SocketProvider>
-          </ReduxProvider>
+          <ReduxProvider>{children}</ReduxProvider>
         </NextAuthSessionProvider>
       </body>
     </html>
