@@ -18,8 +18,8 @@ const sora = Sora({
 });
 
 export const metadata: Metadata = {
-  title: "CareerAI - AI Resume Analyzer",
-  description: "Get your ATS score instantly with CareerAI - The ultimate AI resume analyzer.",
+  title: "GiftAI - AI Personalized Gift Platform",
+  description: "Create personalized AI-generated gifts with anime & cartoon portraits. Shop unique, one-of-a-kind gifts powered by AI.",
 };
 
 export default function RootLayout({

@@ -1,184 +1,111 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import NRInput from "@/components/form/NRInput";
 import { useResetPasswordMutation } from "@/redux/api/authApi";
-
-import { Eye, EyeOff } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Lock, ShieldCheck, ArrowRight } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import * as z from "zod";
+import { motion } from "framer-motion";
 
-export default function ResetPassword() {
+const resetPasswordSchema = z.object({
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Confirm your password"),
+}).refine((data) => data.newPassword === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+type ResetPasswordValues = z.infer<typeof resetPasswordSchema>;
+
+export default function ResetPasswordPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const email = searchParams.get("email");
 
-  const router = useRouter();
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
 
-  const [resetPassword, { isLoading }] = useResetPasswordMutation() as any;
-
-  const form = useForm<FieldValues>({
+  const methods = useForm<ResetPasswordValues>({
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       newPassword: "",
       confirmPassword: "",
     },
   });
 
-  const { isSubmitting } = form.formState;
+  const onSubmit = async (data: ResetPasswordValues) => {
+    try {
+      const res = await resetPassword({
+        email,
+        password: data.confirmPassword,
+      }).unwrap() as any;
 
-  const watchNewPassword = form.watch("newPassword");
-  const watchConfirmPassword = form.watch("confirmPassword");
-  const isPasswordMatch =
-    watchNewPassword &&
-    watchConfirmPassword &&
-    watchNewPassword === watchConfirmPassword;
-
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
-  const toggleNewPassword = () => setShowNewPassword((prev) => !prev);
-  const toggleConfirmPassword = () => setShowConfirmPassword((prev) => !prev);
-
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    // console.log("Resetting password with:", data);
-
-    const payload = {
-      email: email,
-      password: data?.confirmPassword,
-    };
-
-    const res = await resetPassword(payload).unwrap();
-    if (res.success) {
-      toast.success(res.message);
-      router.push("/login");
-    } else {
-      toast.error(res.message);
+      if (res.success) {
+        toast.success("Password reset successful! Please log in.");
+        router.push("/login");
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to reset password.");
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row">
-      {/* Left Panel */}
-      <div className="hidden lg:flex lg:w-1/2 relative">
-        <div
-          className="w-full h-full bg-cover bg-center bg-no-repeat"
-          style={{
-            backgroundImage: "url('/images/banner_22.jpg')",
-          }}
-        ></div>
-      </div>
-
-      {/* Right Panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 bg-white">
-        <div className="bg-white shadow-lg rounded-2xl p-8 w-full max-w-md">
-          <div className="mb-8 text-center">
-            <h2 className="text-[40px] font-bold text-gray-800 mb-2">
-              Change Password
-            </h2>
+    <div className="min-h-screen bg-neutral-50 flex items-center justify-center p-4">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-neutral-100 p-8 md:p-12"
+      >
+        <div className="max-w-sm mx-auto space-y-8">
+          <div className="flex flex-col items-center text-center space-y-4">
+            <div className="w-16 h-16 bg-neutral-900 rounded-2xl flex items-center justify-center text-primary shadow-xl">
+              <ShieldCheck className="w-8 h-8" />
+            </div>
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold text-neutral-900">New Password</h2>
+              <p className="text-neutral-500">Create a secure password for your account.</p>
+            </div>
           </div>
 
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              {/* New Password */}
-              <FormField
-                control={form.control}
-                name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
-                      New Password
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={showNewPassword ? "text" : "password"}
-                          placeholder="Enter new password"
-                          {...field}
-                          className="py-6 pr-12 rounded-2xl"
-                        />
-                        <button
-                          type="button"
-                          onClick={toggleNewPassword}
-                          className="absolute inset-y-0 right-4 flex items-center text-gray-500"
-                        >
-                          {showNewPassword ? (
-                            <EyeOff size={20} />
-                          ) : (
-                            <Eye size={20} />
-                          )}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <FormProvider {...methods}>
+            <form onSubmit={methods.handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-4">
+                <NRInput
+                  name="newPassword"
+                  label="New Password"
+                  type="password"
+                  placeholder="••••••••"
+                  control={methods.control}
+                  icon={Lock}
+                />
+                
+                <NRInput
+                  name="confirmPassword"
+                  label="Confirm Password"
+                  type="password"
+                  placeholder="••••••••"
+                  control={methods.control}
+                  icon={Lock}
+                />
+              </div>
 
-              {/* Confirm Password */}
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-gray-700 font-medium">
-                      Confirm Password
-                    </FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type={showConfirmPassword ? "text" : "password"}
-                          placeholder="Re-enter new password"
-                          {...field}
-                          className="py-6 pr-12 rounded-2xl"
-                        />
-                        <button
-                          type="button"
-                          onClick={toggleConfirmPassword}
-                          className="absolute inset-y-0 right-4 flex items-center text-gray-500"
-                        >
-                          {showConfirmPassword ? (
-                            <EyeOff size={20} />
-                          ) : (
-                            <Eye size={20} />
-                          )}
-                        </button>
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/90 rounded-lg font-medium transition-colors"
-                disabled={isSubmitting || !isPasswordMatch}
-              >
-                Continue
-              </Button>
-
-              {/* Show password mismatch error */}
-              {!isPasswordMatch && watchConfirmPassword && (
-                <p className="text-sm text-red-500 font-medium text-center -mt-4">
-                  Passwords do not match.
-                </p>
-              )}
+              <div className="pt-2">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full h-12 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl transition-all font-semibold flex items-center justify-center gap-2 shadow-lg shadow-neutral-200"
+                >
+                  {isLoading ? "Saving..." : "Reset Password"}
+                  {!isLoading && <ArrowRight className="w-4 h-4" />}
+                </Button>
+              </div>
             </form>
-          </Form>
+          </FormProvider>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

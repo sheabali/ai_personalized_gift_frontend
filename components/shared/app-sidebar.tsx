@@ -8,10 +8,12 @@ import {
 } from "@/components/ui/sidebar";
 import Logo from "@/src/assets/logo.png";
 import {
-  HandCoins,
+  BarChart3,
+  Gift,
   Home,
-  InfoIcon,
   LayoutDashboard,
+  Package,
+  ShoppingBag,
   User,
   Users,
 } from "lucide-react";
@@ -24,14 +26,14 @@ const data = {
   user: {
     navMain: [
       {
-        title: "Dashboard",
+        title: "My Orders",
         url: "/user",
-        icon: LayoutDashboard,
+        icon: ShoppingBag,
       },
       {
-        title: "Your Profile",
-        url: "/user/dashboard/profile",
-        icon: User,
+        title: "AI Designs",
+        url: "/ai-design",
+        icon: Gift,
       },
       {
         title: "Go Back To Home",
@@ -48,26 +50,24 @@ const data = {
         icon: LayoutDashboard,
       },
       {
-        title: "Users",
-        url: "/user/dashboard/users",
-        icon: HandCoins,
-        items: [
-          {
-            title: "Users",
-            url: "/user/dashboard/estimates",
-            icon: Users,
-          },
-          {
-            title: "Pending Users",
-            url: "/user/dashboard/pending-users",
-            icon: InfoIcon,
-          },
-        ],
+        title: "Products",
+        url: "/admin/products",
+        icon: Package,
       },
       {
-        title: "Your Profile",
-        url: "/user/dashboard/profile",
-        icon: User,
+        title: "Orders",
+        url: "/admin/orders",
+        icon: ShoppingBag,
+      },
+      {
+        title: "Users",
+        url: "/admin/users",
+        icon: Users,
+      },
+      {
+        title: "Analytics",
+        url: "/admin/analytics",
+        icon: BarChart3,
       },
       {
         title: "Go Back To Home",
@@ -78,7 +78,6 @@ const data = {
   },
 };
 
-// add roles based on your requirements
 interface AppSidebarProps {
   role: string;
 }
@@ -89,7 +88,7 @@ export default function AppSidebar({ role, ...props }: AppSidebarProps) {
   return (
     <Sidebar
       collapsible="icon"
-      className="w-64 bg-white border-r border-blue-200"
+      className="w-64 bg-white border-r border-neutral-100"
       {...props}
     >
       <SidebarHeader>
@@ -99,10 +98,10 @@ export default function AppSidebar({ role, ...props }: AppSidebarProps) {
         >
           <Image
             src={Logo.src}
-            alt="Logo"
+            alt="GiftAI Logo"
             width={300}
             height={300}
-            className="size-auto "
+            className="size-auto"
           />
         </Link>
       </SidebarHeader>

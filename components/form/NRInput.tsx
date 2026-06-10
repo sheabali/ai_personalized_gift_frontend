@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
-type PHInputProps = {
+type NRInputProps = {
   type?: string;
   name: string;
   label?: string;
@@ -22,7 +22,7 @@ type PHInputProps = {
   control: any;
 };
 
-const PHInput = ({
+const NRInput = ({
   type = "text",
   name,
   label,
@@ -30,7 +30,7 @@ const PHInput = ({
   icon: Icon,
   placeholder,
   control,
-}: PHInputProps) => {
+}: NRInputProps) => {
   const isPassword = type === "password";
   const [showPassword, setShowPassword] = useState(false);
 
@@ -87,4 +87,4 @@ const PHInput = ({
   );
 };
 
-export default PHInput;
+export default NRInput;

@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { BaseQueryFn, FetchArgs, FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { logout } from "../features/authSlice";
-import { RootState } from "../store";
+import type { RootState } from "../store";
 
 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL;
 
@@ -44,9 +44,20 @@ const baseQueryWithAuth: ReturnType<typeof fetchBaseQuery> = async (
 export const baseApi = createApi({
   reducerPath: "baseApi",
   baseQuery: baseQueryWithAuth,
-  tagTypes: ["User", "Events", "Chat", "Message"],
-  endpoints: (builder) => ({}),
+  tagTypes: [
+    "User",
+    "Product",
+    "Order",
+    "Cart",
+    "AiDesign",
+    "Review",
+    "Upload",
+    "SiteConfig",
+    "Analytics",
+  ],
+  endpoints: () => ({}),
 });
+
 
 //* for refresh token use this following setup of base api
 //* Change the refresh api url (if needed)
