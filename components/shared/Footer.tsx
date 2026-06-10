@@ -13,7 +13,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-muted py-12 border-t border-border">
-      <div className="container mx-auto max-w-screen-xl px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="container mx-auto max-w-7xl px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1 md:col-span-1">
           <Link href="/" className="flex items-center space-x-2 mb-4">
             <span className="font-heading font-bold text-2xl text-primary">
