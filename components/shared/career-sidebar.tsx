@@ -1,21 +1,29 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from 'react';
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuItem,
   SidebarMenuButton,
-  SidebarProvider,
+  SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, FileSearch, History, LogOut, Clock, Zap } from "lucide-react";
+import {
+  useGetAnalysisHistoryQuery,
+  useGetDashboardStatsQuery,
+} from "@/redux/api/resumeApi";
+import {
+  Clock,
+  FileSearch,
+  History,
+  LayoutDashboard,
+  LogOut,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useGetDashboardStatsQuery, useGetAnalysisHistoryQuery } from '@/redux/api/resumeApi';
-import { Badge } from "@/components/ui/badge";
 
 const navItems = [
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
@@ -39,14 +47,16 @@ export function CareerSidebar() {
             C
           </div>
           <span className="font-bold text-xl text-gray-800 group-data-[collapsible=icon]:hidden">
-            CareerAI
+            GiftAI
           </span>
         </Link>
       </SidebarHeader>
       <SidebarContent className="px-3 py-4 space-y-8">
         {/* Main Nav */}
         <div className="space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 mb-2 group-data-[collapsible=icon]:hidden">Menu</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 mb-2 group-data-[collapsible=icon]:hidden">
+            Menu
+          </p>
           <SidebarMenu>
             {navItems.map((item) => (
               <SidebarMenuItem key={item.title}>
@@ -54,8 +64,8 @@ export function CareerSidebar() {
                   asChild
                   isActive={pathname === item.url}
                   className={`flex items-center gap-3 px-3 py-2 rounded-md transition-all ${
-                    pathname === item.url 
-                      ? "bg-[#6B5FD3]/10 text-[#6B5FD3]" 
+                    pathname === item.url
+                      ? "bg-[#6B5FD3]/10 text-[#6B5FD3]"
                       : "text-gray-600 hover:bg-gray-50"
                   }`}
                 >
@@ -71,33 +81,41 @@ export function CareerSidebar() {
 
         {/* Latest Analyses */}
         <div className="space-y-1 group-data-[collapsible=icon]:hidden">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 mb-2">My Analyses</p>
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 mb-2">
+            My Analyses
+          </p>
           <div className="space-y-1">
             {latestAnalyses.map((analysis: any) => (
-              <Link 
-                key={analysis.id} 
+              <Link
+                key={analysis.id}
                 href={`/analyzer/results/${analysis.id}`}
                 className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:bg-gray-50 rounded-md transition-colors"
               >
                 <Clock className="w-3.5 h-3.5 text-gray-400" />
-                <span className="truncate">{analysis.jobTitle || 'Untitled'}</span>
+                <span className="truncate">
+                  {analysis.jobTitle || "Untitled"}
+                </span>
               </Link>
             ))}
           </div>
         </div>
 
         {/* Usage Badge */}
-        {dashboardStats?.currentPlan === 'FREE' && (
+        {dashboardStats?.currentPlan === "FREE" && (
           <div className="px-3 group-data-[collapsible=icon]:hidden">
             <div className="bg-indigo-50/50 p-4 rounded-xl border border-indigo-100/50">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-indigo-900">Analyses Left</span>
+                <span className="text-xs font-semibold text-indigo-900">
+                  Analyses Left
+                </span>
                 <Zap className="w-3 h-3 text-indigo-500 fill-indigo-500" />
               </div>
               <div className="h-1.5 w-full bg-indigo-100 rounded-full overflow-hidden mb-1">
-                <div 
-                  className="h-full bg-[#6B5FD3] transition-all duration-500" 
-                  style={{ width: `${(dashboardStats.creditsRemaining / 3) * 100}%` }}
+                <div
+                  className="h-full bg-[#6B5FD3] transition-all duration-500"
+                  style={{
+                    width: `${(dashboardStats.creditsRemaining / 3) * 100}%`,
+                  }}
                 />
               </div>
               <p className="text-[10px] text-indigo-600 font-medium">
