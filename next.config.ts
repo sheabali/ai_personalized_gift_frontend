@@ -5,19 +5,33 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "http",
-        hostname: "**",
+        hostname: "localhost",
       },
       {
-        protocol: "https",
-        hostname: "**",
+        protocol: "http",
+        hostname: "127.0.0.1",
       },
-
       {
         protocol: "https",
         hostname: "localhost",
       },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ibb.co",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.pravatar.cc",
+      },
     ],
-    domains: ["localhost", "127.0.0.1", "i.ibb.co"],
   },
 };
 

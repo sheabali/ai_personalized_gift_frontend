@@ -1,12 +1,13 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
-import { Stage, Layer, Image as KonvaImage, Transformer } from 'react-konva';
-import useImage from 'use-image';
+import { useEffect, useRef, useState } from "react";
+import { Image as KonvaImage, Layer, Stage, Transformer } from "react-konva";
+import useImage from "use-image";
 
 export default function MockupCanvas({ imageUrl }: { imageUrl: string }) {
   // Try loading with crossOrigin, if fails, fallback to without it
-  const [image, status] = useImage(imageUrl, 'anonymous');
-  const [imageFallback] = useImage(status === 'failed' ? imageUrl : '');
+  const [image, status] = useImage(imageUrl, "anonymous");
+  const [imageFallback] = useImage(status === "failed" ? imageUrl : "");
 
   const finalImage = image || imageFallback;
 
@@ -16,12 +17,21 @@ export default function MockupCanvas({ imageUrl }: { imageUrl: string }) {
   const shapeRef = useRef<any>(null);
   const trRef = useRef<any>(null);
 
+  console.log("finalImage", finalImage);
+  console.log("dimensions", dimensions);
+  console.log("selected", selected);
+  // console.log("shapeRef", shapeRef);
+  const count = useState(0)[0];
+  console.log("count", count);
+
+  // console.log("trRef", trRef);
+
   useEffect(() => {
     const checkSize = () => {
       if (containerRef.current) {
         setDimensions({
           width: containerRef.current.offsetWidth,
-          height: containerRef.current.offsetHeight
+          height: containerRef.current.offsetHeight,
         });
       }
     };
@@ -50,7 +60,11 @@ export default function MockupCanvas({ imageUrl }: { imageUrl: string }) {
   const initialSize = Math.min(dimensions.width, dimensions.height) * 0.55;
 
   return (
-    <div ref={containerRef} className="w-full h-full relative" onMouseLeave={() => setSelected(false)}>
+    <div
+      ref={containerRef}
+      className="w-full h-full relative"
+      onMouseLeave={() => setSelected(false)}
+    >
       <Stage
         width={dimensions.width}
         height={dimensions.height}
@@ -77,7 +91,7 @@ export default function MockupCanvas({ imageUrl }: { imageUrl: string }) {
               draggable
               onClick={() => setSelected(true)}
               onTap={() => setSelected(true)}
-            // No blend mode needed here since remove.bg makes it completely transparent
+              // No blend mode needed here since remove.bg makes it completely transparent
             />
           )}
           {selected && (

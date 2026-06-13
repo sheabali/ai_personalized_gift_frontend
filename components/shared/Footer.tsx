@@ -21,8 +21,7 @@ const Footer = () => {
             </span>
           </Link>
           <p className="text-sm text-muted-foreground mb-4">
-            The ultimate AI resume analyzer. Get your ATS score instantly and
-            land more interviews.
+            Turn your memories into unique, beautiful art gifts with the power of AI. From custom anime portraits to Pixar-style 3D cartoons.
           </p>
         </div>
 
@@ -68,9 +67,25 @@ const Footer = () => {
 
         <div>
           <h4 className="font-heading font-semibold mb-4 text-foreground">
-            Legal
+            Company & Legal
           </h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
+            <li>
+              <Link
+                href="/about"
+                className="hover:text-primary transition-colors"
+              >
+                About Us
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/contact"
+                className="hover:text-primary transition-colors"
+              >
+                Contact Us
+              </Link>
+            </li>
             <li>
               <Link
                 href="/privacy"
@@ -87,14 +102,6 @@ const Footer = () => {
                 Terms of Service
               </Link>
             </li>
-            <li>
-              <Link
-                href="/contact"
-                className="hover:text-primary transition-colors"
-              >
-                Contact Us
-              </Link>
-            </li>
           </ul>
         </div>
 
@@ -103,7 +110,7 @@ const Footer = () => {
             Newsletter
           </h4>
           <p className="text-sm text-muted-foreground mb-4">
-            Get the latest career tips and product updates.
+            Get the latest AI styles, custom gift collections, and exclusive discount codes.
           </p>
           <form onSubmit={handleSubscribe} className="flex gap-2">
             <Input
