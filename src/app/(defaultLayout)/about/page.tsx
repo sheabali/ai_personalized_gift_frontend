@@ -99,9 +99,9 @@ export default function AboutPage() {
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mx-auto text-primary">
               <Users className="w-8 h-8" />
             </div>
-            <h3 className="text-2xl font-bold text-neutral-900">5,000+ Happy Customers</h3>
+            <h3 className="text-2xl font-bold text-neutral-900">Loved by Our Community</h3>
             <p className="text-neutral-500 text-sm">
-              We&apos;ve helped thousands of creators, parents, and friends craft memorable keepsakes that bring smiles, tears, and joy.
+              We help creators, parents, and friends craft memorable keepsakes that bring smiles, tears, and joy.
             </p>
           </div>
         </motion.div>

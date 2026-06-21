@@ -7,7 +7,7 @@ import { CloudCog } from "lucide-react";
 // Protected Routes Configuration
 // ============================================
 const authRoutes = ["/login", "/register", "/forgot-password"];
-const protectedRoutes = ["/admin", "/user", "/cart", "/checkout", "/orders", "/ai-design"];
+const protectedRoutes = ["/admin", "/user", "/orders"];
 const adminOnlyRoutes = ["/admin"];
 
 interface DecodedToken {

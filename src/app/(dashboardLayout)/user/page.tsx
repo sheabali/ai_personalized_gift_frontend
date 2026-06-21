@@ -170,7 +170,10 @@ export default function UserOrderHistoryPage() {
                 {order.shippingAddress && (
                   <div className="pt-2 border-t border-neutral-50">
                     <p className="text-xs text-neutral-400 font-medium uppercase tracking-wider mb-1">Shipping To</p>
-                    <p className="text-sm text-neutral-600">{order.shippingAddress}</p>
+                    <p className="text-sm text-neutral-600">
+                      <span className="font-semibold text-neutral-800">{typeof order.shippingAddress.fullName === 'string' ? order.shippingAddress.fullName : 'Guest'}</span> ({typeof order.shippingAddress.phone === 'string' ? order.shippingAddress.phone : 'N/A'}) <br/>
+                      {typeof order.shippingAddress.address === 'string' ? order.shippingAddress.address : 'N/A'}, {typeof order.shippingAddress.city === 'string' ? order.shippingAddress.city : 'N/A'} - {typeof order.shippingAddress.zipCode === 'string' ? order.shippingAddress.zipCode : ''}
+                    </p>
                   </div>
                 )}
               </motion.div>

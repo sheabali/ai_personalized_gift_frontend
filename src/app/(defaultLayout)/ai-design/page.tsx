@@ -52,6 +52,7 @@ export default function AiDesignPage() {
   const [subjectDescription, setSubjectDescription] = useState("");
   const [originalImageUrl, setOriginalImageUrl] = useState("");
   const [generatedImageUrl, setGeneratedImageUrl] = useState("");
+  const [generatedDesignId, setGeneratedDesignId] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
   const { data: productData } = useGetProductByIdQuery(productId as string, { skip: !productId });
@@ -106,6 +107,7 @@ export default function AiDesignPage() {
 
       if (res.success) {
         setGeneratedImageUrl(res.data.generatedImage);
+        setGeneratedDesignId(res.data.id);
         toast.success("Magic complete!");
         setStep(3);
       }
@@ -318,34 +320,34 @@ export default function AiDesignPage() {
                     <Button
                       onClick={async () => {
                         if (!productData?.data) return;
-                        
+
                         // Show loading state optionally, or just await
                         const toastId = toast.loading("Saving your design...");
-                        
+
                         let finalThumbnail = productData.data.thumbnail;
                         const container = document.getElementById("mockup-container");
-                        
+
                         if (container) {
                           try {
                             // Hide the UI elements before capture
                             const badge = container.querySelector(".absolute.top-4.left-4");
                             if (badge) (badge as HTMLElement).style.display = "none";
-                            
+
                             const dataUrl = await toPng(container, { cacheBust: true, pixelRatio: 2, skipFonts: true });
-                            
+
                             // Convert dataUrl to File and upload to Cloudinary
                             const blob = await (await fetch(dataUrl)).blob();
                             const file = new File([blob], `mockup-${Date.now()}.png`, { type: "image/png" });
                             const formData = new FormData();
                             formData.append("image", file);
-                            
+
                             const uploadRes = await uploadImage(formData).unwrap();
                             if (uploadRes.success) {
                               finalThumbnail = uploadRes.data.url;
                             } else {
                               finalThumbnail = dataUrl; // fallback
                             }
-                            
+
                             if (badge) (badge as HTMLElement).style.display = "block";
                           } catch (err) {
                             console.error("Failed to capture or upload mockup", err);
@@ -360,7 +362,7 @@ export default function AiDesignPage() {
                           category: productData.data.category,
                           price: productData.data.discountPrice || productData.data.price,
                           quantity: 1,
-                          aiDesignId: generatedImageUrl, 
+                          aiDesignId: generatedDesignId,
                           aiDesign: {
                             generatedImage: generatedImageUrl
                           }

@@ -48,10 +48,12 @@ export default function AdminOrdersPage() {
 
   const filteredOrders = orders.filter((order: any) => {
     if (!search) return true;
+    const customerName = order.user?.name || order.shippingAddress?.fullName || "";
+    const customerEmail = order.user?.email || order.shippingAddress?.email || "";
     return (
       order.id?.toLowerCase().includes(search.toLowerCase()) ||
-      order.user?.name?.toLowerCase().includes(search.toLowerCase()) ||
-      order.user?.email?.toLowerCase().includes(search.toLowerCase())
+      customerName.toLowerCase().includes(search.toLowerCase()) ||
+      customerEmail.toLowerCase().includes(search.toLowerCase())
     );
   });
 
@@ -150,8 +152,12 @@ export default function AdminOrdersPage() {
                     </TableCell>
                     <TableCell>
                       <div>
-                        <p className="font-semibold text-neutral-900 text-sm">{order.user?.name || "—"}</p>
-                        <p className="text-xs text-neutral-400">{order.user?.email || "—"}</p>
+                        <p className="font-semibold text-neutral-900 text-sm">
+                          {order.user?.name || order.shippingAddress?.fullName || "Guest Customer"}
+                        </p>
+                        <p className="text-xs text-neutral-400">
+                          {order.user?.email || order.shippingAddress?.email || "—"}
+                        </p>
                       </div>
                     </TableCell>
                     <TableCell className="font-bold text-neutral-900">

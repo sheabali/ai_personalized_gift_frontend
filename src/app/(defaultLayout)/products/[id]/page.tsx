@@ -135,24 +135,15 @@ export default function ProductDetailsPage() {
               <h1 className="text-4xl md:text-5xl font-extrabold text-neutral-900 tracking-tight leading-tight">
                 {product.name}
               </h1>
-
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 text-yellow-400">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-current" />
-                  ))}
-                </div>
-                <span className="text-sm font-medium text-neutral-500">(128 customer reviews)</span>
-              </div>
             </div>
 
             <div className="flex items-end gap-3">
               <span className="text-4xl font-bold text-neutral-900">
-                ${product.discountPrice || product.price}
+                ৳{product.discountPrice || product.price}
               </span>
               {product.discountPrice && (
                 <span className="text-xl text-neutral-400 line-through mb-1">
-                  ${product.price}
+                  ৳{product.price}
                 </span>
               )}
             </div>

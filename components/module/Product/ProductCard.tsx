@@ -89,7 +89,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               {name}
             </h3>
           </Link>
-          
+
           <div className="flex items-center gap-1 text-yellow-400">
             {[...Array(5)].map((_, i) => (
               <Star key={i} className="w-3 h-3 fill-current" />
@@ -97,20 +97,20 @@ export default function ProductCard({ product }: ProductCardProps) {
             <span className="text-xs text-neutral-400 ml-1">(4.8)</span>
           </div>
 
-          <div className="flex items-center gap-2 pt-1">
-            <span className="text-xl font-bold text-neutral-900">
-              ${discountPrice || price}
+          <div className="flex items-end gap-2">
+            <span className="text-lg font-bold text-neutral-900">
+              ৳{discountPrice || price}
             </span>
             {discountPrice && (
-              <span className="text-sm text-neutral-400 line-through">
-                ${price}
+              <span className="text-sm text-neutral-400 line-through mb-0.5">
+                ৳{price}
               </span>
             )}
           </div>
         </CardContent>
 
         <CardFooter className="p-5 pt-0">
-          <Button 
+          <Button
             onClick={(e) => {
               e.preventDefault();
               handleAddToCart();

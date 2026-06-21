@@ -47,7 +47,7 @@ export default function OrderSuccessPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Button asChild className="h-14 bg-neutral-900 hover:bg-neutral-800 text-white rounded-2xl font-bold text-lg gap-2">
-            <Link href="/profile/orders">
+            <Link href="/user">
               View Order History
               <ArrowRight className="w-5 h-5" />
             </Link>

@@ -70,6 +70,15 @@ export default function CheckoutPage() {
         })),
         shippingAddress: `${data.address}, ${data.city}, ${data.zipCode}`,
         totalAmount: totalAmount,
+        guestInfo: {
+          name: data.name,
+          email: data.email,
+          phone: data.phone,
+          address: data.address,
+          city: data.city,
+          zipCode: data.zipCode,
+          country: "Bangladesh"
+        }
       };
 
       const res = await createOrder(orderData).unwrap();
@@ -155,13 +164,13 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="md:hidden">
-                  <Button
-                    type="submit"
-                    disabled={isOrdering}
-                    className="w-full h-14 bg-neutral-900 hover:bg-neutral-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-neutral-200"
-                  >
-                    {isOrdering ? "Processing..." : `Pay $${totalAmount.toFixed(2)}`}
-                  </Button>
+                    <Button
+                      type="submit"
+                      disabled={isOrdering || user?.role === "ADMIN"}
+                      className="w-full h-14 bg-neutral-900 hover:bg-neutral-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-neutral-200 disabled:opacity-50"
+                    >
+                      {user?.role === "ADMIN" ? "Admins cannot order" : isOrdering ? "Processing..." : `Pay ৳${totalAmount.toFixed(2)}`}
+                    </Button>
                 </div>
               </form>
             </FormProvider>
@@ -181,7 +190,7 @@ export default function CheckoutPage() {
                     <div className="flex-1">
                       <p className="text-sm font-bold text-neutral-900 line-clamp-1">{item.name}</p>
                       <p className="text-xs text-neutral-400">Qty: {item.quantity}</p>
-                      <p className="text-sm font-bold text-neutral-900 mt-1">${(item.price * item.quantity).toFixed(2)}</p>
+                      <p className="text-sm font-bold text-neutral-900 mt-1">৳{(item.price * item.quantity).toFixed(2)}</p>
                     </div>
                   </div>
                 ))}
@@ -190,7 +199,7 @@ export default function CheckoutPage() {
               <div className="space-y-4 pt-6 border-t border-neutral-100">
                 <div className="flex justify-between text-neutral-500 font-medium">
                   <span>Subtotal</span>
-                  <span className="text-neutral-900 font-bold">${totalAmount.toFixed(2)}</span>
+                  <span className="text-neutral-900 font-bold">৳{totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-neutral-500 font-medium">
                   <span>Shipping</span>
@@ -198,17 +207,17 @@ export default function CheckoutPage() {
                 </div>
                 <div className="pt-4 border-t border-neutral-100 flex justify-between items-end">
                   <span className="text-lg font-bold text-neutral-900">Total Due</span>
-                  <span className="text-3xl font-extrabold text-neutral-900">${totalAmount.toFixed(2)}</span>
+                  <span className="text-3xl font-extrabold text-neutral-900">৳{totalAmount.toFixed(2)}</span>
                 </div>
               </div>
 
               <div className="hidden md:block">
                 <Button
                   onClick={methods.handleSubmit(onSubmit)}
-                  disabled={isOrdering}
-                  className="w-full h-14 bg-neutral-900 hover:bg-neutral-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-neutral-200 gap-3"
+                  disabled={isOrdering || user?.role === "ADMIN"}
+                  className="w-full h-14 bg-neutral-900 hover:bg-neutral-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-neutral-200 gap-3 disabled:opacity-50"
                 >
-                  {isOrdering ? "Processing..." : `Confirm & Pay Now`}
+                  {user?.role === "ADMIN" ? "Admins cannot place orders" : isOrdering ? "Processing..." : `Confirm & Pay Now`}
                   <ShieldCheck className="w-5 h-5" />
                 </Button>
               </div>

@@ -125,7 +125,7 @@ export default function CartPage() {
                           </button>
                         </div>
                         <div className="text-xl font-bold text-neutral-900">
-                          ${(item.price * item.quantity).toFixed(2)}
+                          ৳{(item.price * item.quantity).toFixed(2)}
                         </div>
                       </div>
                     </div>
@@ -151,19 +151,19 @@ export default function CartPage() {
               <div className="space-y-4">
                 <div className="flex justify-between text-neutral-500 font-medium">
                   <span>Subtotal</span>
-                  <span className="text-neutral-900">${subTotal.toFixed(2)}</span>
+                  <span className="text-neutral-900">৳{subTotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-neutral-500 font-medium">
                   <span>Shipping</span>
-                  <span className="text-green-500 font-bold">FREE</span>
+                  <span className="text-neutral-900">Calculated at checkout</span>
                 </div>
                 <div className="flex justify-between text-neutral-500 font-medium">
                   <span>Tax</span>
-                  <span className="text-neutral-900">$0.00</span>
+                  <span className="text-neutral-900">৳0.00</span>
                 </div>
                 <div className="pt-4 border-t border-neutral-100 flex justify-between items-end">
-                  <span className="text-lg font-bold text-neutral-900">Total Amount</span>
-                  <span className="text-3xl font-extrabold text-neutral-900">${totalAmount.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-neutral-900">Total</span>
+                  <span className="text-3xl font-extrabold text-neutral-900">৳{totalAmount.toFixed(2)}</span>
                 </div>
               </div>
 
