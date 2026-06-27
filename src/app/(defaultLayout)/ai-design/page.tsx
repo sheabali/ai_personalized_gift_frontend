@@ -1,7 +1,7 @@
 "use client";
 
 import { useUploadImageMutation } from "@/redux/api/uploadApi";
-import { useGenerateDesignMutation } from "@/redux/api/aiDesignApi";
+import { useGenerateDesignMutation, useGetDesignByIdQuery } from "@/redux/api/aiDesignApi";
 import { useGetProductByIdQuery } from "@/redux/api/productApi";
 import { useAppDispatch } from "@/redux/hooks";
 import { addToCart } from "@/redux/features/cartSlice";
@@ -24,19 +24,25 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 import { Loader2, Wand2, Download, ShoppingBag } from "lucide-react";
-import DynamicMockupCanvas from "../../../components/module/AiDesign/DynamicMockupCanvas";
+
 import { toPng } from "html-to-image";
+import DynamicMockupCanvas from "@/src/components/module/AiDesign/DynamicMockupCanvas";
 
 const STYLES = [
   { id: "anime", name: "Anime Style", image: "https://images.unsplash.com/photo-1578632292335-df3abbb0d586?q=80&w=500&auto=format&fit=crop", description: "Vibrant colors and expressive features" },
   { id: "cartoon", name: "3D Cartoon", image: "https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=500&auto=format&fit=crop", description: "Playful Pixar-style 3D aesthetics" },
   { id: "sketch", name: "Pencil Sketch", image: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=500&auto=format&fit=crop", description: "Hand-drawn artistic pencil details" },
   { id: "cyberpunk", name: "Cyberpunk", image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?q=80&w=500&auto=format&fit=crop", description: "Neon lights and futuristic vibes" },
+  { id: "oil-painting", name: "Oil Painting", image: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=500&auto=format&fit=crop", description: "Classic, textured brushstroke art" },
+  { id: "pop-art", name: "Pop Art", image: "https://images.unsplash.com/photo-1536890992765-f42a1ee1e2a8?q=80&w=500&auto=format&fit=crop", description: "Bold colors and retro comic vibes" },
+  { id: "ghibli", name: "Studio Ghibli", image: "https://images.unsplash.com/photo-1560972550-aba3456b5564?q=80&w=500&auto=format&fit=crop", description: "Magical, whimsical anime aesthetics" },
+  { id: "watercolor", name: "Watercolor", image: "https://images.unsplash.com/photo-1543857778-c4a1a3e0b2eb?q=80&w=500&auto=format&fit=crop", description: "Soft, flowing, and dreamy colors" },
 ];
 
 export default function AiDesignPage() {
   const searchParams = useSearchParams();
   const productId = searchParams.get("productId");
+  const aiDesignIdFromUrl = searchParams.get("aiDesignId");
   const router = useRouter();
   const dispatch = useAppDispatch();
 
@@ -55,9 +61,23 @@ export default function AiDesignPage() {
   const [generatedDesignId, setGeneratedDesignId] = useState("");
   const [isUploading, setIsUploading] = useState(false);
 
+
   const { data: productData } = useGetProductByIdQuery(productId as string, { skip: !productId });
+  const { data: fetchedDesignRes, isLoading: isFetchingDesign } = useGetDesignByIdQuery(aiDesignIdFromUrl as string, { skip: !aiDesignIdFromUrl });
   const [uploadImage] = useUploadImageMutation();
   const [generateDesign, { isLoading: isGenerating }] = useGenerateDesignMutation();
+
+  useEffect(() => {
+    if (fetchedDesignRes?.data && aiDesignIdFromUrl) {
+      const design = fetchedDesignRes.data;
+      setOriginalImageUrl(design.originalImage);
+      setGeneratedImageUrl(design.generatedImage);
+      setGeneratedDesignId(design.id);
+      setSelectedStyle(design.styleType);
+      setSubjectDescription(design.prompt);
+      setStep(3);
+    }
+  }, [fetchedDesignRes, aiDesignIdFromUrl]);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -138,9 +158,16 @@ export default function AiDesignPage() {
           </div>
         </div>
 
+        {isFetchingDesign && (
+          <div className="flex flex-col items-center justify-center py-20 space-y-4">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-neutral-500 font-medium">Loading your saved design...</p>
+          </div>
+        )}
+
         <AnimatePresence mode="wait">
           {/* Step 1: Upload Photo */}
-          {step === 1 && (
+          {step === 1 && !isFetchingDesign && (
             <motion.div
               key="step1"
               initial={{ opacity: 0, x: 20 }}
@@ -390,6 +417,8 @@ export default function AiDesignPage() {
         </AnimatePresence>
 
       </div>
+
+
     </div>
   );
 }

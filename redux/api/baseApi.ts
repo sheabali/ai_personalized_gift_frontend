@@ -54,6 +54,11 @@ export const baseApi = createApi({
     "Upload",
     "SiteConfig",
     "Analytics",
+    "Wishlist",
+    "Reminders",
+    "Referrals",
+    "Coupon",
+    "BlogPost",
   ],
   endpoints: () => ({}),
 });

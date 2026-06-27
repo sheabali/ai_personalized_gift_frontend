@@ -1,7 +1,8 @@
 "use client";
 
 import { useGetProductByIdQuery } from "@/redux/api/productApi";
-import { useAppDispatch } from "@/redux/hooks";
+import { useGetMyWishlistQuery, useToggleWishlistMutation } from "@/redux/api/wishlistApi";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { addToCart } from "@/redux/features/cartSlice";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -17,18 +18,29 @@ import {
   RotateCcw
 } from "lucide-react";
 import Image from "next/image";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
+import ProductReviews from "@/components/module/Product/ProductReviews";
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const aiDesignId = searchParams.get("aiDesignId");
   const { data, isLoading } = useGetProductByIdQuery(id as string);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [isRedirectingToAi, setIsRedirectingToAi] = useState(false);
+
+  const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
+  
+  const { data: wishlistData } = useGetMyWishlistQuery(undefined, {
+    skip: !user,
+  });
+  const [toggleWishlist] = useToggleWishlistMutation();
 
   if (isLoading) {
     return (
@@ -49,7 +61,23 @@ export default function ProductDetailsPage() {
     );
   }
 
-  const dispatch = useAppDispatch();
+  const isWishlisted = wishlistData?.data?.some((item: any) => item.productId === product.id);
+
+  const handleToggleWishlist = async () => {
+    if (!user) {
+      toast.error("Please login to add to wishlist");
+      return;
+    }
+    try {
+      const res = await toggleWishlist({ productId: product.id }).unwrap();
+      if (res.success) {
+        toast.success(res.message);
+      }
+    } catch (error) {
+      toast.error("Failed to update wishlist");
+    }
+  };
+
   const images = [product.thumbnail, ...(product.images || [])];
 
   const handleAddToCart = () => {
@@ -127,7 +155,14 @@ export default function ProductDetailsPage() {
                   {product.category}
                 </Badge>
                 <div className="flex items-center gap-2">
-                  <button className="p-2 hover:bg-neutral-100 rounded-full transition-colors"><Heart className="w-5 h-5 text-neutral-400" /></button>
+                  <button 
+                    onClick={handleToggleWishlist}
+                    className={`p-2 rounded-full transition-colors ${
+                      isWishlisted ? 'bg-red-50 text-red-500 hover:bg-red-100' : 'hover:bg-neutral-100 text-neutral-400 hover:text-red-500'
+                    }`}
+                  >
+                    <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+                  </button>
                   <button className="p-2 hover:bg-neutral-100 rounded-full transition-colors"><Share2 className="w-5 h-5 text-neutral-400" /></button>
                 </div>
               </div>
@@ -157,16 +192,20 @@ export default function ProductDetailsPage() {
               <div className="bg-primary/5 border border-primary/10 rounded-3xl p-6 space-y-4">
                 <div className="flex items-center gap-3 text-primary">
                   <Sparkles className="w-6 h-6" />
-                  <h3 className="text-lg font-bold">Personalize with AI</h3>
+                  <h3 className="text-lg font-bold">
+                    {aiDesignId ? "Apply Saved Design" : "Personalize with AI"}
+                  </h3>
                 </div>
                 <p className="text-sm text-neutral-600">
-                  Use our AI magic to turn your photo into a stunning cartoon or anime portrait for this {product.name.toLowerCase()}.
+                  {aiDesignId
+                    ? "Apply your previously saved AI design onto this product."
+                    : `Use our AI magic to turn your photo into a stunning cartoon or anime portrait for this ${product.name.toLowerCase()}.`}
                 </p>
                 <Button 
                   onClick={() => {
                     setIsRedirectingToAi(true);
                     setTimeout(() => {
-                      router.push(`/ai-design?productId=${product.id}`);
+                      router.push(`/ai-design?productId=${product.id}${aiDesignId ? `&aiDesignId=${aiDesignId}` : ""}`);
                     }, 1000);
                   }}
                   disabled={isRedirectingToAi}
@@ -177,6 +216,8 @@ export default function ProductDetailsPage() {
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                       Magic in progress...
                     </div>
+                  ) : aiDesignId ? (
+                    "Apply Design Now"
                   ) : (
                     "Start Designing Now"
                   )}
@@ -228,6 +269,9 @@ export default function ProductDetailsPage() {
             </div>
           </div>
         </div>
+
+        {/* Product Reviews */}
+        <ProductReviews productId={product.id} />
       </div>
     </div>
   );

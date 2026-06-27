@@ -62,6 +62,14 @@ const Footer = () => {
                 FAQ
               </Link>
             </li>
+            <li>
+              <Link
+                href="/blogs"
+                className="hover:text-primary transition-colors"
+              >
+                Blogs & Gift Guides
+              </Link>
+            </li>
           </ul>
         </div>
 

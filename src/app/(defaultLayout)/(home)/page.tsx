@@ -12,10 +12,13 @@ import {
   Truck,
   Zap,
   Image as ImageIcon,
-  Heart
+  Heart,
+  Upload,
+  Wand2
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import GiftFinderQuiz from "@/components/module/Home/GiftFinderQuiz";
 import { motion } from "framer-motion";
 
 export default function HomePage() {
@@ -116,6 +119,65 @@ export default function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section className="py-24 px-4 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16 space-y-4">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-neutral-900 tracking-tight">How It Works</h2>
+            <p className="text-neutral-500 text-lg max-w-xl mx-auto">Turn your ordinary photos into extraordinary personalized gifts in just 3 simple steps.</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+            {/* Connecting Line (Desktop Only) */}
+            <div className="hidden md:block absolute top-[60px] left-[15%] right-[15%] h-0.5 bg-neutral-100 z-0">
+              <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-primary/50 to-primary/10"></div>
+            </div>
+
+            {[
+              {
+                step: "01",
+                icon: Upload,
+                title: "Upload Photo",
+                desc: "Choose your favorite memory. We accept any standard image format.",
+                color: "bg-blue-50 text-blue-600"
+              },
+              {
+                step: "02",
+                icon: Wand2,
+                title: "Choose Style",
+                desc: "Pick from Anime, 3D Cartoon, Sketch, or Cyberpunk AI styles.",
+                color: "bg-purple-50 text-purple-600"
+              },
+              {
+                step: "03",
+                icon: Gift,
+                title: "Get Gift",
+                desc: "We print your masterpiece on high-quality materials and ship it to you.",
+                color: "bg-primary/10 text-primary"
+              }
+            ].map((item, idx) => (
+              <div key={idx} className="relative z-10 flex flex-col items-center text-center">
+                <div className={`w-28 h-28 rounded-[2rem] flex items-center justify-center mb-8 shadow-sm border-8 border-white ${item.color}`}>
+                  <item.icon className="w-12 h-12" />
+                </div>
+                <div className="bg-neutral-900 text-white text-xs font-black uppercase tracking-widest px-3 py-1 rounded-full mb-4">
+                  Step {item.step}
+                </div>
+                <h3 className="text-2xl font-extrabold text-neutral-900 mb-3">{item.title}</h3>
+                <p className="text-neutral-500 leading-relaxed max-w-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Gift Finder Quiz Section */}
+      <section className="py-12 px-4">
+        <div className="container mx-auto">
+          <GiftFinderQuiz />
         </div>
       </section>
 

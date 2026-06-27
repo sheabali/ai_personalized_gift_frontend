@@ -16,6 +16,10 @@ import {
   ShoppingBag,
   User,
   Users,
+  Palette,
+  CalendarHeart,
+  Ticket,
+  FileText,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,14 +30,34 @@ const data = {
   user: {
     navMain: [
       {
-        title: "My Orders",
+        title: "Order History",
         url: "/user",
         icon: ShoppingBag,
       },
       {
-        title: "AI Designs",
-        url: "/ai-design",
+        title: "Wishlist",
+        url: "/user/wishlist",
         icon: Gift,
+      },
+      {
+        title: "AI Designs",
+        url: "/user/ai-designs",
+        icon: Palette,
+      },
+      {
+        title: "Gift Reminders",
+        url: "/user/reminders",
+        icon: CalendarHeart,
+      },
+      {
+        title: "Referral & Earn",
+        url: "/user/referrals",
+        icon: Users,
+      },
+      {
+        title: "Profile Settings",
+        url: "/user/profile",
+        icon: User,
       },
       {
         title: "Go Back To Home",
@@ -65,9 +89,19 @@ const data = {
         icon: Users,
       },
       {
+        title: "Coupons",
+        url: "/admin/coupons",
+        icon: Ticket,
+      },
+      {
         title: "Analytics",
         url: "/admin/analytics",
         icon: BarChart3,
+      },
+      {
+        title: "Blogs",
+        url: "/admin/blogs",
+        icon: FileText,
       },
       {
         title: "Go Back To Home",

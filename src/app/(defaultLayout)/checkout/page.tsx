@@ -2,6 +2,7 @@
 
 import { useAppSelector, useAppDispatch } from "@/redux/hooks";
 import { useCreateOrderMutation } from "@/redux/api/orderApi";
+import { useValidateCouponMutation } from "@/redux/api/couponApi";
 import { clearCart } from "@/redux/features/cartSlice";
 import { Button } from "@/components/ui/button";
 import NRInput from "@/components/form/NRInput";
@@ -19,6 +20,7 @@ import {
   Truck
 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -41,6 +43,23 @@ export default function CheckoutPage() {
   const { user } = useAppSelector((state) => state.auth);
 
   const [createOrder, { isLoading: isOrdering }] = useCreateOrderMutation();
+  const [validateCoupon, { isLoading: isValidatingCoupon }] = useValidateCouponMutation();
+  const [couponCode, setCouponCode] = useState("");
+  const [discount, setDiscount] = useState({ amount: 0, code: "" });
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode) return;
+    try {
+      const res = await validateCoupon({ code: couponCode, subTotal: totalAmount }).unwrap();
+      if (res.success) {
+        setDiscount({ amount: res.data.discountAmount, code: res.data.code });
+        toast.success(`Coupon applied! You saved ৳${res.data.discountAmount}`);
+      }
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Invalid coupon code");
+      setDiscount({ amount: 0, code: "" });
+    }
+  };
 
   const methods = useForm<CheckoutValues>({
     resolver: zodResolver(checkoutSchema),
@@ -69,7 +88,8 @@ export default function CheckoutPage() {
           price: item.price
         })),
         shippingAddress: `${data.address}, ${data.city}, ${data.zipCode}`,
-        totalAmount: totalAmount,
+        totalAmount: totalAmount - discount.amount,
+        couponCode: discount.code || null,
         guestInfo: {
           name: data.name,
           email: data.email,
@@ -169,7 +189,7 @@ export default function CheckoutPage() {
                       disabled={isOrdering || user?.role === "ADMIN"}
                       className="w-full h-14 bg-neutral-900 hover:bg-neutral-800 text-white rounded-2xl font-bold text-lg shadow-xl shadow-neutral-200 disabled:opacity-50"
                     >
-                      {user?.role === "ADMIN" ? "Admins cannot order" : isOrdering ? "Processing..." : `Pay ৳${totalAmount.toFixed(2)}`}
+                      {user?.role === "ADMIN" ? "Admins cannot order" : isOrdering ? "Processing..." : `Pay ৳${(totalAmount - discount.amount).toFixed(2)}`}
                     </Button>
                 </div>
               </form>
@@ -196,18 +216,44 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              <div className="flex gap-2 border-t border-neutral-100 pt-6">
+                <input 
+                  type="text" 
+                  placeholder="Promo Code" 
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value)}
+                  className="flex-1 px-4 py-3 rounded-xl border border-neutral-200 focus:border-primary outline-none"
+                  disabled={discount.amount > 0}
+                />
+                <Button 
+                  type="button"
+                  onClick={discount.amount > 0 ? () => { setDiscount({ amount: 0, code: "" }); setCouponCode(""); } : handleApplyCoupon}
+                  disabled={isValidatingCoupon || (!couponCode && discount.amount === 0)}
+                  className="h-[50px] rounded-xl"
+                  variant={discount.amount > 0 ? "outline" : "default"}
+                >
+                  {isValidatingCoupon ? "Applying..." : discount.amount > 0 ? "Remove" : "Apply"}
+                </Button>
+              </div>
+
               <div className="space-y-4 pt-6 border-t border-neutral-100">
                 <div className="flex justify-between text-neutral-500 font-medium">
                   <span>Subtotal</span>
                   <span className="text-neutral-900 font-bold">৳{totalAmount.toFixed(2)}</span>
                 </div>
+                {discount.amount > 0 && (
+                  <div className="flex justify-between text-[#7E122C] font-medium">
+                    <span>Discount ({discount.code})</span>
+                    <span className="font-bold">-৳{discount.amount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-neutral-500 font-medium">
                   <span>Shipping</span>
                   <span className="text-green-600 font-bold">FREE</span>
                 </div>
                 <div className="pt-4 border-t border-neutral-100 flex justify-between items-end">
                   <span className="text-lg font-bold text-neutral-900">Total Due</span>
-                  <span className="text-3xl font-extrabold text-neutral-900">৳{totalAmount.toFixed(2)}</span>
+                  <span className="text-3xl font-extrabold text-neutral-900">৳{(totalAmount - discount.amount).toFixed(2)}</span>
                 </div>
               </div>
 

@@ -2,9 +2,9 @@
 
 import { Button } from "@/components/ui/button";
 import NRInput from "@/components/form/NRInput";
-import { useLoginMutation } from "@/redux/api/authApi";
+import { useLoginMutation, useSocialAuthMutation } from "@/redux/api/authApi";
 import { setUser } from "@/redux/features/authSlice";
-import { useAppDispatch } from "@/redux/hooks";
+import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Mail, Lock, Gift, ArrowRight } from "lucide-react";
 import Image from "next/image";
@@ -13,6 +13,8 @@ import { useRouter } from "next/navigation";
 import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { signIn, useSession } from "next-auth/react";
+import { useEffect, useRef } from "react";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -25,6 +27,57 @@ export default function LoginPage() {
   const router = useRouter();
   const dispatch = useAppDispatch();
   const [login, { isLoading }] = useLoginMutation();
+  const [socialAuth, { isLoading: isSocialLoading }] = useSocialAuthMutation();
+  const { data: session, status } = useSession();
+  const { token } = useAppSelector((state) => state.auth);
+  const hasCalledSocialAuth = useRef(false);
+
+  useEffect(() => {
+    if (status === "authenticated" && session?.user?.email && !token && !hasCalledSocialAuth.current) {
+      hasCalledSocialAuth.current = true;
+
+      const email = session.user.email;
+      const name = session.user.name || "Google User";
+      const avatar = session.user.image || null;
+      const googleId = (session as any).providerAccountId || null;
+
+      const handleSocialLogin = async () => {
+        try {
+          const referredBy = localStorage.getItem("gift_ai_referred_by") || undefined;
+          const res = await socialAuth({
+            email,
+            name,
+            avatar,
+            googleId,
+            referredBy,
+          }).unwrap() as any;
+
+          if (res.success) {
+            dispatch(
+              setUser({
+                token: res.data.accessToken,
+                user: res.data.user,
+              })
+            );
+
+            toast.success("Welcome back! Logged in with Google.");
+            localStorage.removeItem("gift_ai_referred_by");
+
+            if (res.data.user?.role === "ADMIN") {
+              router.push("/admin/dashboard");
+            } else {
+              router.push("/");
+            }
+          }
+        } catch (error: any) {
+          toast.error(error?.data?.message || "Google authentication failed.");
+          hasCalledSocialAuth.current = false;
+        }
+      };
+
+      handleSocialLogin();
+    }
+  }, [status, session, token, socialAuth, dispatch, router]);
 
   const methods = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -125,11 +178,23 @@ export default function LoginPage() {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <Button variant="outline" className="h-11 rounded-xl border-neutral-200">
-                <Image src="/images/google.svg" alt="Google" width={20} height={20} className="mr-2" />
-                Google
+              <Button
+                type="button"
+                variant="outline"
+                className="h-11 rounded-xl border-neutral-200"
+                onClick={() => signIn("google")}
+                disabled={status === "loading" || isSocialLoading}
+              >
+                {isSocialLoading ? (
+                  <span>Connecting...</span>
+                ) : (
+                  <>
+                    <Image src="/images/google.svg" alt="Google" width={20} height={20} className="mr-2" />
+                    Google
+                  </>
+                )}
               </Button>
-              <Button variant="outline" className="h-11 rounded-xl border-neutral-200">
+              <Button type="button" variant="outline" className="h-11 rounded-xl border-neutral-200" disabled>
                 <Image src="/images/facebook.svg" alt="Facebook" width={20} height={20} className="mr-2" />
                 Facebook
               </Button>

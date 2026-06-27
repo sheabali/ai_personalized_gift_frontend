@@ -97,6 +97,13 @@ const Navbar = () => {
           >
             AI Design
           </Link>
+          <Link
+            href="/blogs"
+            className={`text-sm font-semibold transition-colors hover:text-primary ${pathname === "/blogs" || pathname.startsWith("/blogs/") ? "text-primary" : "text-muted-foreground"
+              }`}
+          >
+            Blogs
+          </Link>
         </nav>
 
         {/* Actions Section (Desktop) */}
@@ -239,6 +246,14 @@ const Navbar = () => {
                       }`}
                   >
                     AI Design
+                  </Link>
+                  <Link
+                    href="/blogs"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`text-lg font-semibold py-2 transition-colors border-b border-border/10 ${pathname === "/blogs" || pathname.startsWith("/blogs/") ? "text-primary" : "text-foreground"
+                      }`}
+                  >
+                    Blogs
                   </Link>
                 </nav>
               </div>

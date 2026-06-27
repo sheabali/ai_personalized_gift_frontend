@@ -8,6 +8,7 @@ export interface GetProductsParams {
   minPrice?: number;
   maxPrice?: number;
   isActive?: boolean | string;
+  tags?: string;
 }
 
 export const productApi = baseApi.injectEndpoints({
@@ -61,6 +62,15 @@ export const productApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["Product"],
     }),
+
+    // Get AI Recommendations
+    getAiGiftRecommendations: builder.mutation({
+      query: (body: { recipient: string; occasion: string; budget: string; interests: string }) => ({
+        url: "/products/ai-recommend",
+        method: "POST",
+        body,
+      }),
+    }),
   }),
 });
 
@@ -71,4 +81,5 @@ export const {
   useCreateProductMutation,
   useUpdateProductMutation,
   useDeleteProductMutation,
+  useGetAiGiftRecommendationsMutation,
 } = productApi;

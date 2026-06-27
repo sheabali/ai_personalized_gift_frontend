@@ -100,10 +100,18 @@ const cartSlice = createSlice({
       state.subTotal = 0;
       state.totalAmount = 0;
     },
+
+    setCartItems(state, action: PayloadAction<CartItem[]>) {
+      state.items = action.payload;
+      const totals = calcTotals(state.items);
+      state.totalItems = totals.totalItems;
+      state.subTotal = totals.subTotal;
+      state.totalAmount = totals.totalAmount;
+    },
   },
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } =
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setCartItems } =
   cartSlice.actions;
 
 export default cartSlice.reducer;

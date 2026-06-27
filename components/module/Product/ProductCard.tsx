@@ -10,15 +10,41 @@ import { motion } from "framer-motion";
 
 import { useAppDispatch } from "@/redux/hooks";
 import { addToCart } from "@/redux/features/cartSlice";
+import { useGetMyWishlistQuery, useToggleWishlistMutation } from "@/redux/api/wishlistApi";
 import { toast } from "sonner";
+import { useAppSelector } from "@/redux/hooks";
 
 interface ProductCardProps {
   product: any;
+  aiDesignId?: string | null;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, aiDesignId }: ProductCardProps) {
   const dispatch = useAppDispatch();
+  const { user } = useAppSelector((state) => state.auth);
   const { id, name, price, discountPrice, thumbnail, category, isAiEnabled, stock } = product;
+
+  const { data: wishlistData } = useGetMyWishlistQuery(undefined, {
+    skip: !user,
+  });
+  const [toggleWishlist] = useToggleWishlistMutation();
+
+  const isWishlisted = wishlistData?.data?.some((item: any) => item.productId === id);
+
+  const handleToggleWishlist = async () => {
+    if (!user) {
+      toast.error("Please login to add to wishlist");
+      return;
+    }
+    try {
+      const res = await toggleWishlist({ productId: id }).unwrap();
+      if (res.success) {
+        toast.success(res.message);
+      }
+    } catch (error) {
+      toast.error("Failed to update wishlist");
+    }
+  };
 
   const handleAddToCart = () => {
     dispatch(addToCart({
@@ -58,12 +84,19 @@ export default function ProductCard({ product }: ProductCardProps) {
         </div>
 
         {/* Favorite Button */}
-        <button className="absolute top-4 right-4 z-10 p-2 bg-white/80 backdrop-blur-md rounded-full text-neutral-400 hover:text-red-500 hover:bg-white transition-all shadow-sm">
-          <Heart className="w-5 h-5" />
+        <button 
+          onClick={handleToggleWishlist}
+          className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all shadow-sm ${
+            isWishlisted 
+              ? 'bg-red-50 text-red-500 hover:bg-red-100' 
+              : 'bg-white/80 backdrop-blur-md text-neutral-400 hover:text-red-500 hover:bg-white'
+          }`}
+        >
+          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
         </button>
 
         {/* Image Section */}
-        <Link href={`/products/${id}`}>
+        <Link href={`/products/${id}${aiDesignId ? `?aiDesignId=${aiDesignId}` : ""}`}>
           <div className="relative aspect-[4/5] overflow-hidden">
             <Image
               src={thumbnail || "/images/placeholder-product.jpg"}
@@ -84,7 +117,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
             {category}
           </p>
-          <Link href={`/products/${id}`}>
+          <Link href={`/products/${id}${aiDesignId ? `?aiDesignId=${aiDesignId}` : ""}`}>
             <h3 className="text-lg font-bold text-neutral-900 group-hover:text-primary transition-colors line-clamp-1">
               {name}
             </h3>
