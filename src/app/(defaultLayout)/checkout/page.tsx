@@ -46,6 +46,7 @@ export default function CheckoutPage() {
   const [validateCoupon, { isLoading: isValidatingCoupon }] = useValidateCouponMutation();
   const [couponCode, setCouponCode] = useState("");
   const [discount, setDiscount] = useState({ amount: 0, code: "" });
+  const [paymentMethod, setPaymentMethod] = useState<"sslcommerz" | "stripe">("sslcommerz");
 
   const handleApplyCoupon = async () => {
     if (!couponCode) return;
@@ -90,6 +91,7 @@ export default function CheckoutPage() {
         shippingAddress: `${data.address}, ${data.city}, ${data.zipCode}`,
         totalAmount: totalAmount - discount.amount,
         couponCode: discount.code || null,
+        paymentMethod,
         guestInfo: {
           name: data.name,
           email: data.email,
@@ -164,17 +166,44 @@ export default function CheckoutPage() {
                     <h3 className="text-xl font-bold">Payment Method</h3>
                   </div>
 
-                  <div className="p-6 border-2 border-primary bg-primary/5 rounded-2xl flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                        <Image src="/images/sslcommerz.png" alt="SSLCommerz" width={32} height={32} />
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Option 1: SSLCommerz */}
+                    <div 
+                      onClick={() => setPaymentMethod("sslcommerz")}
+                      className={`p-6 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition-all duration-200 ${
+                        paymentMethod === "sslcommerz" ? "border-primary bg-primary/5" : "border-neutral-100 hover:border-neutral-200 bg-white"
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-neutral-100">
+                          <Image src="/images/sslcommerz.png" alt="SSLCommerz" width={32} height={32} />
+                        </div>
+                        <div>
+                          <p className="font-bold text-neutral-900">SSLCommerz (bKash/Cards)</p>
+                          <p className="text-xs text-neutral-500">Pay using local cards or mobile banking</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-bold text-neutral-900">Online Payment</p>
-                        <p className="text-xs text-neutral-500">Pay securely via SSLCOMMERZ gateway</p>
-                      </div>
+                      <div className={`w-6 h-6 rounded-full border-4 ${paymentMethod === "sslcommerz" ? "border-primary bg-white" : "border-neutral-200 bg-white"}`}></div>
                     </div>
-                    <div className="w-6 h-6 rounded-full border-4 border-primary bg-white"></div>
+
+                    {/* Option 2: Stripe */}
+                    <div 
+                      onClick={() => setPaymentMethod("stripe")}
+                      className={`p-6 border-2 rounded-2xl flex items-center justify-between cursor-pointer transition-all duration-200 ${
+                        paymentMethod === "stripe" ? "border-primary bg-primary/5" : "border-neutral-100 hover:border-neutral-200 bg-white"
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-neutral-100">
+                          <CreditCard className="w-6 h-6 text-neutral-600" />
+                        </div>
+                        <div>
+                          <p className="font-bold text-neutral-900">Stripe (International Cards)</p>
+                          <p className="text-xs text-neutral-500">Pay using international credit/debit cards</p>
+                        </div>
+                      </div>
+                      <div className={`w-6 h-6 rounded-full border-4 ${paymentMethod === "stripe" ? "border-primary bg-white" : "border-neutral-200 bg-white"}`}></div>
+                    </div>
                   </div>
 
                   <p className="text-xs text-neutral-400 flex items-center gap-2">

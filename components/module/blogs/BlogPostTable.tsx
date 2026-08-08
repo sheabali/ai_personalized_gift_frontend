@@ -1,18 +1,12 @@
 "use client";
 
-import Image from "next/image";
-import {
-  FileText,
-  Calendar,
-  Eye,
-  Edit2,
-  Trash2,
-  Loader2,
-  AlertCircle,
-  Image as ImageIcon,
-  Search,
-} from "lucide-react";
+import { useMemo } from "react";
+import { FileText, AlertCircle, Search } from "lucide-react";
 import { BlogPost, BlogMeta } from "./blog.types";
+import { getBlogColumns } from "./BlogColumns";
+import { NRTable } from "@/components/ui/core/NRTable";
+import TablePagination from "@/components/ui/core/NRTable/TablePagination";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // ─── Search & Filter Bar ─────────────────────────────────────────────────────
 
@@ -54,111 +48,39 @@ export function BlogSearchBar({
   );
 }
 
-// ─── Table Row ────────────────────────────────────────────────────────────────
+// ─── Skeleton Loader ──────────────────────────────────────────────────────────
 
-interface BlogTableRowProps {
-  post: BlogPost;
-  onEdit: (post: BlogPost) => void;
-  onDelete: (post: BlogPost) => void;
-  onTogglePublish: (post: BlogPost) => void;
-}
-
-function BlogTableRow({ post, onEdit, onDelete, onTogglePublish }: BlogTableRowProps) {
+function BlogTableSkeleton() {
   return (
-    <tr className="hover:bg-neutral-50/50 transition-colors duration-150">
-      <td className="p-6">
-        <div className="flex items-center gap-4">
-          <div className="relative w-16 h-12 rounded-xl overflow-hidden bg-neutral-100 flex-shrink-0">
-            {post.thumbnail ? (
-              <Image src={post.thumbnail} alt={post.title} fill className="object-cover" />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-neutral-400">
-                <ImageIcon className="w-5 h-5" />
-              </div>
-            )}
+    <div className="bg-white rounded-[2.5rem] border border-neutral-100 shadow-xs overflow-hidden p-6 space-y-4">
+      {/* Header row */}
+      <div className="grid grid-cols-6 gap-4 pb-3 border-b border-neutral-100">
+        {["Article", "Slug", "Author", "Date", "Status", "Actions"].map((h) => (
+          <Skeleton key={h} className="h-4 w-16" />
+        ))}
+      </div>
+      {/* 5 data rows */}
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="grid grid-cols-6 gap-4 py-4 items-center border-b border-neutral-50 last:border-none">
+          <div className="flex items-center gap-3">
+            <Skeleton className="w-16 h-12 rounded-xl flex-shrink-0" />
+            <div className="space-y-1.5">
+              <Skeleton className="h-3.5 w-28" />
+              <Skeleton className="h-3 w-20" />
+            </div>
           </div>
-          <div className="min-w-0 max-w-xs">
-            <h4 className="font-bold text-neutral-800 text-sm truncate">{post.title}</h4>
-            <p className="text-xs text-neutral-400 truncate mt-0.5">
-              {post.summary || "No summary added"}
-            </p>
-          </div>
+          <Skeleton className="h-6 w-24 rounded-lg" />
+          <Skeleton className="h-4 w-20" />
+          <Skeleton className="h-4 w-24" />
+          <Skeleton className="h-6 w-20 rounded-full" />
+          <Skeleton className="h-8 w-24 rounded-xl ml-auto" />
         </div>
-      </td>
-
-      <td className="p-6">
-        <span className="font-mono text-xs bg-neutral-50 px-2.5 py-1.5 rounded-lg border border-neutral-100 text-neutral-600 block max-w-xs truncate">
-          {post.slug}
-        </span>
-      </td>
-
-      <td className="p-6">
-        <span className="text-neutral-600 text-sm font-medium">{post.author}</span>
-      </td>
-
-      <td className="p-6">
-        <div className="flex items-center gap-2 text-neutral-500 text-sm font-medium">
-          <Calendar className="w-4 h-4 text-neutral-400" />
-          {post.publishedAt
-            ? new Date(post.publishedAt).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })
-            : "Unpublished"}
-        </div>
-      </td>
-
-      <td className="p-6">
-        <button
-          onClick={() => onTogglePublish(post)}
-          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
-            post.isPublished
-              ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-              : "bg-amber-50 text-amber-700 hover:bg-amber-100"
-          }`}
-        >
-          <span
-            className={`w-1.5 h-1.5 rounded-full ${
-              post.isPublished ? "bg-emerald-500" : "bg-amber-500"
-            }`}
-          />
-          {post.isPublished ? "Published" : "Draft"}
-        </button>
-      </td>
-
-      <td className="p-6 text-right">
-        <div className="flex items-center justify-end gap-2">
-          <a
-            href={`/blogs/${post.slug}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-2 hover:bg-neutral-50 text-neutral-400 hover:text-neutral-700 rounded-xl transition-all duration-200"
-            title="View Live"
-          >
-            <Eye className="w-5 h-5" />
-          </a>
-          <button
-            onClick={() => onEdit(post)}
-            className="p-2 hover:bg-neutral-50 text-neutral-400 hover:text-rose-500 rounded-xl transition-all duration-200 cursor-pointer"
-            title="Edit"
-          >
-            <Edit2 className="w-5 h-5" />
-          </button>
-          <button
-            onClick={() => onDelete(post)}
-            className="p-2 hover:bg-rose-50 text-neutral-400 hover:text-rose-500 rounded-xl transition-all duration-200 cursor-pointer"
-            title="Delete"
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
-        </div>
-      </td>
-    </tr>
+      ))}
+    </div>
   );
 }
 
-// ─── Pagination ───────────────────────────────────────────────────────────────
+// ─── Pagination Wrapper ───────────────────────────────────────────────────────
 
 interface PaginationProps {
   page: number;
@@ -167,24 +89,14 @@ interface PaginationProps {
 }
 
 export function BlogPagination({ page, meta, onPageChange }: PaginationProps) {
-  if (meta.total <= meta.limit) return null;
+  const totalPage = Math.ceil(meta.total / meta.limit);
+  if (totalPage <= 1) return null;
   return (
-    <div className="flex justify-center gap-2 pt-4">
-      <button
-        onClick={() => onPageChange(Math.max(1, page - 1))}
-        disabled={page === 1}
-        className="px-4 py-2 border border-neutral-200 rounded-xl font-bold text-sm bg-white hover:bg-neutral-50 disabled:opacity-50 transition-colors cursor-pointer"
-      >
-        Previous
-      </button>
-      <button
-        onClick={() => onPageChange(page + 1)}
-        disabled={page * meta.limit >= meta.total}
-        className="px-4 py-2 border border-neutral-200 rounded-xl font-bold text-sm bg-white hover:bg-neutral-50 disabled:opacity-50 transition-colors cursor-pointer"
-      >
-        Next
-      </button>
-    </div>
+    <TablePagination
+      totalPage={totalPage}
+      currentPage={page}
+      onPageChange={onPageChange}
+    />
   );
 }
 
@@ -207,14 +119,13 @@ export function BlogPostTable({
   onDelete,
   onTogglePublish,
 }: BlogPostTableProps) {
-  if (isLoading) {
-    return (
-      <div className="bg-white rounded-[2.5rem] border border-neutral-100 shadow-xs flex flex-col items-center justify-center py-20 gap-3">
-        <Loader2 className="w-10 h-10 text-rose-500 animate-spin" />
-        <p className="text-neutral-500 font-medium">Loading articles...</p>
-      </div>
-    );
-  }
+  // Memoize column definitions — only recomputed when action handlers change
+  const columns = useMemo(
+    () => getBlogColumns({ onEdit, onDelete, onTogglePublish }),
+    [onEdit, onDelete, onTogglePublish]
+  );
+
+  if (isLoading) return <BlogTableSkeleton />;
 
   if (isError) {
     return (
@@ -239,39 +150,13 @@ export function BlogPostTable({
     );
   }
 
-  const COLUMNS = ["Article", "Slug", "Author", "Publish Date", "Status", "Actions"];
-
   return (
-    <div className="bg-white rounded-[2.5rem] border border-neutral-100 shadow-xs overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-neutral-50 border-b border-neutral-100">
-              {COLUMNS.map((col, i) => (
-                <th
-                  key={col}
-                  className={`p-6 text-sm font-bold text-neutral-500 uppercase tracking-wider ${
-                    i === COLUMNS.length - 1 ? "text-right" : ""
-                  }`}
-                >
-                  {col}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-100">
-            {posts.map((post) => (
-              <BlogTableRow
-                key={post.id}
-                post={post}
-                onEdit={onEdit}
-                onDelete={onDelete}
-                onTogglePublish={onTogglePublish}
-              />
-            ))}
-          </tbody>
-        </table>
-      </div>
+    <div className="bg-white rounded-[2.5rem] border border-neutral-100 shadow-xs overflow-hidden px-6">
+      <NRTable
+        columns={columns}
+        data={posts}
+        emptyMessage="No blog articles found."
+      />
     </div>
   );
 }

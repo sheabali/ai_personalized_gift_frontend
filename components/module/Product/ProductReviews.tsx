@@ -27,13 +27,13 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
 
   const reviews = data?.data || [];
 
-  const averageRating = reviews.length > 0 
+  const averageRating = reviews.length > 0
     ? (reviews.reduce((acc: number, review: any) => acc + review.rating, 0) / reviews.length).toFixed(1)
     : "0.0";
 
   const orders = orderData?.data?.orders || orderData?.data || [];
-  const hasPurchased = orders.some((order: any) => 
-    order.orderStatus === "DELIVERED" && 
+  const hasPurchased = orders.some((order: any) =>
+    order.orderStatus === "DELIVERED" &&
     (order.items || []).some((item: any) => item.productId === productId || item.product?.id === productId)
   );
 
@@ -100,11 +100,10 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                           onClick={() => setRating(star)}
                         >
                           <Star
-                            className={`w-6 h-6 ${
-                              star <= (hoverRating || rating)
-                                ? "fill-primary text-primary"
-                                : "text-neutral-300"
-                            }`}
+                            className={`w-6 h-6 ${star <= (hoverRating || rating)
+                              ? "fill-primary text-primary"
+                              : "text-neutral-300"
+                              }`}
                           />
                         </button>
                       ))}
@@ -121,9 +120,9 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                     />
                   </div>
 
-                  <Button 
-                    type="submit" 
-                    disabled={isCreating} 
+                  <Button
+                    type="submit"
+                    disabled={isCreating}
                     className="w-full font-bold"
                   >
                     {isCreating ? "Submitting..." : "Submit Review"}
@@ -150,11 +149,11 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
             </div>
           ) : reviews.length > 0 ? (
             reviews.map((review: any, index: number) => (
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1 }}
-                key={review.id} 
+                key={review.id}
                 className="bg-white p-6 rounded-2xl shadow-sm border border-neutral-100"
               >
                 <div className="flex justify-between items-start mb-4">

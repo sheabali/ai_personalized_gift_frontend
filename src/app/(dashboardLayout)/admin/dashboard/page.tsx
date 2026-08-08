@@ -1,16 +1,8 @@
 "use client";
 
 import { useGetAdminStatsQuery } from "@/redux/api/analyticsApi";
-import DashboardStats from "@/components/module/Admin/DashboardStats";
-import RevenueChart from "@/components/module/Admin/RevenueChart";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow
-} from "@/components/ui/table";
+import DashboardStats from "@/components/module/Admin/Dashboard/DashboardStats";
+import RevenueChart from "@/components/module/Admin/Dashboard/RevenueChart";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, ShoppingCart, RefreshCw } from "lucide-react";

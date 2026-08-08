@@ -5,7 +5,6 @@ import {
   ShoppingBag, 
   Users, 
   Sparkles,
-  TrendingUp,
   ArrowUpRight,
   ArrowDownRight
 } from "lucide-react";

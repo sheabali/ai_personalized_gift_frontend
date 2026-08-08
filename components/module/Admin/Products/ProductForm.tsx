@@ -35,6 +35,7 @@ const productSchema = z.object({
   isAiEnabled: z.boolean().default(false),
   thumbnail: z.string().min(1, "Thumbnail is required"),
   images: z.array(z.string()).optional(),
+  sizes: z.array(z.string()).optional(),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
@@ -55,18 +56,21 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
 
   const methods = useForm<any>({
     resolver: zodResolver(productSchema),
-    defaultValues: initialData || {
-      name: "",
-      description: "",
-      price: 0,
-      discountPrice: 0,
-      category: "",
-      stock: 0,
-      isActive: true,
-      isAiEnabled: false,
-      thumbnail: "",
-      images: [],
-    },
+    defaultValues: initialData
+      ? { ...initialData, sizes: initialData.sizes || [] }
+      : {
+          name: "",
+          description: "",
+          price: 0,
+          discountPrice: 0,
+          category: "",
+          stock: 0,
+          isActive: true,
+          isAiEnabled: false,
+          thumbnail: "",
+          images: [],
+          sizes: [],
+        },
   });
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -195,6 +199,7 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
                       <Image src={thumbnailPreview} alt="Preview" fill className="object-cover" />
                       <button 
                         onClick={() => { setThumbnailPreview(""); methods.setValue("thumbnail", ""); }}
+                        type="button"
                         className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                       >
                         <X className="w-4 h-4" />
@@ -244,6 +249,39 @@ export default function ProductForm({ initialData, isEdit }: ProductFormProps) {
                     onCheckedChange={(val) => methods.setValue("isAiEnabled", val)} 
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm space-y-6">
+              <div className="flex items-center gap-2 text-neutral-900 mb-4">
+                <Tag className="w-5 h-5" />
+                <h3 className="text-xl font-bold">Sizes Available</h3>
+              </div>
+              <div className="flex flex-wrap gap-2.5">
+                {["S", "M", "L", "XL", "2XL"].map((size) => {
+                  const currentSizes = methods.watch("sizes") || [];
+                  const isChecked = currentSizes.includes(size);
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      onClick={() => {
+                        if (isChecked) {
+                          methods.setValue("sizes", currentSizes.filter((s: string) => s !== size));
+                        } else {
+                          methods.setValue("sizes", [...currentSizes, size]);
+                        }
+                      }}
+                      className={`min-w-[44px] h-9 px-3 flex items-center justify-center rounded-full text-xs font-semibold border transition-all ${
+                        isChecked 
+                          ? "bg-black border-black text-white" 
+                          : "bg-white border-neutral-200 text-neutral-600 hover:border-black"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

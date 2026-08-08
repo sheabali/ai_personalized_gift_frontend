@@ -1,4 +1,4 @@
-import ProductTable from "@/components/module/Admin/ProductTable";
+import ProductTable from "@/components/module/Admin/Products/ProductTable";
 
 export const metadata = {
   title: "Manage Products | GiftAI Admin",
@@ -12,7 +12,7 @@ export default function AdminProductsPage() {
         <h1 className="text-3xl font-bold text-neutral-900 tracking-tight">Products</h1>
         <p className="text-neutral-500">Manage your product catalog, prices, and stock levels.</p>
       </div>
-      
+
       <ProductTable />
     </div>
   );

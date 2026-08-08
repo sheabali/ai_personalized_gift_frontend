@@ -18,6 +18,12 @@ import {
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSearchParams } from "next/navigation";
+import { 
+  DropdownMenu, 
+  DropdownMenuTrigger, 
+  DropdownMenuContent, 
+  DropdownMenuItem 
+} from "@/components/ui/dropdown-menu";
 
 const CATEGORIES = ["All", "t-shirt", "mug", "hoodie", "canvas", "accessories"];
 const OCCASIONS = ["birthday", "anniversary", "wedding", "corporate", "valentine"];
@@ -31,6 +37,8 @@ export default function ProductListPage() {
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
   const [selectedOccasions, setSelectedOccasions] = useState<string[]>([]);
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
   const [page, setPage] = useState(1);
   const limit = 8;
 
@@ -43,6 +51,8 @@ export default function ProductListPage() {
     minPrice: undefined as number | undefined,
     maxPrice: undefined as number | undefined,
     tags: "",
+    sortBy: "createdAt",
+    sortOrder: "desc",
     page: 1,
     limit: 8
   });
@@ -55,13 +65,15 @@ export default function ProductListPage() {
         minPrice: minPrice ? Number(minPrice) : undefined,
         maxPrice: maxPrice ? Number(maxPrice) : undefined,
         tags: selectedOccasions.join(","),
+        sortBy,
+        sortOrder,
         page,
         limit
       });
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, category, minPrice, maxPrice, selectedOccasions, page]);
+  }, [searchTerm, category, minPrice, maxPrice, selectedOccasions, sortBy, sortOrder, page]);
 
   const { data, isLoading, isFetching } = useGetAllProductsQuery(apiFilters);
 
@@ -87,6 +99,8 @@ export default function ProductListPage() {
     setMinPrice("");
     setMaxPrice("");
     setSelectedOccasions([]);
+    setSortBy("createdAt");
+    setSortOrder("desc");
     setPage(1);
   };
 
@@ -245,9 +259,37 @@ export default function ProductListPage() {
               
               <div className="hidden sm:flex items-center gap-4">
                 <span className="text-sm text-neutral-400 font-medium">Sort by:</span>
-                <button className="text-sm font-bold flex items-center gap-1 text-neutral-900 hover:text-primary transition-colors">
-                  Newest <ChevronDown className="w-4 h-4" />
-                </button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button className="text-sm font-bold flex items-center gap-1 text-neutral-900 hover:text-primary transition-colors cursor-pointer outline-hidden">
+                      {sortBy === "price" 
+                        ? (sortOrder === "asc" ? "Price: Low to High" : "Price: High to Low")
+                        : "Newest"
+                      }
+                      <ChevronDown className="w-4 h-4 text-neutral-500" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48 bg-white border border-neutral-100 rounded-xl shadow-lg">
+                    <DropdownMenuItem 
+                      onClick={() => { setSortBy("createdAt"); setSortOrder("desc"); setPage(1); }}
+                      className={`cursor-pointer rounded-lg text-sm font-semibold p-2.5 ${sortBy === "createdAt" ? "text-primary bg-primary/5" : "text-neutral-700"}`}
+                    >
+                      Newest
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => { setSortBy("price"); setSortOrder("asc"); setPage(1); }}
+                      className={`cursor-pointer rounded-lg text-sm font-semibold p-2.5 ${sortBy === "price" && sortOrder === "asc" ? "text-primary bg-primary/5" : "text-neutral-700"}`}
+                    >
+                      Price: Low to High
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => { setSortBy("price"); setSortOrder("desc"); setPage(1); }}
+                      className={`cursor-pointer rounded-lg text-sm font-semibold p-2.5 ${sortBy === "price" && sortOrder === "desc" ? "text-primary bg-primary/5" : "text-neutral-700"}`}
+                    >
+                      Price: High to Low
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
 

@@ -1,8 +1,8 @@
 "use client";
 
 import { useGetAdminStatsQuery } from "@/redux/api/analyticsApi";
-import RevenueChart from "@/components/module/Admin/RevenueChart";
-import DashboardStats from "@/components/module/Admin/DashboardStats";
+import RevenueChart from "@/components/module/Admin/Dashboard/RevenueChart";
+import DashboardStats from "@/components/module/Admin/Dashboard/DashboardStats";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 

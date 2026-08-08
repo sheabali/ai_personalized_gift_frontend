@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useAppDispatch, useAppSelector } from "@/redux/hooks";
 import { logout } from "@/redux/features/authSlice";
 import { Button } from "@/components/ui/button";
+import { useGetMyWishlistQuery } from "@/redux/api/wishlistApi";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +30,8 @@ import {
   LogOut,
   LayoutDashboard,
   Gift,
-  ChevronDown
+  ChevronDown,
+  Heart
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -48,6 +50,11 @@ const Navbar = () => {
 
   const { totalItems } = useAppSelector((state) => state.cart);
   const { token, user } = useAppSelector((state) => state.auth);
+
+  const { data: wishlistData } = useGetMyWishlistQuery(undefined, {
+    skip: !token,
+  });
+  const wishlistCount = wishlistData?.data?.length || 0;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -108,6 +115,20 @@ const Navbar = () => {
 
         {/* Actions Section (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
+          {/* Wishlist Icon */}
+          <Link
+            href="/user/wishlist"
+            className="relative p-2.5 text-muted-foreground hover:text-primary transition-all rounded-full hover:bg-muted active:scale-95"
+            aria-label="View Wishlist"
+          >
+            <Heart className="h-5 w-5" />
+            {mounted && token && wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-extrabold text-white animate-in zoom-in duration-200">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+
           {/* Cart Icon */}
           <Link
             href="/cart"
@@ -159,6 +180,12 @@ const Navbar = () => {
                     <span>My Orders</span>
                   </Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild className="rounded-lg">
+                  <Link href="/user/wishlist" className="flex items-center cursor-pointer w-full">
+                    <Heart className="mr-2 h-4 w-4 text-muted-foreground" />
+                    <span>Wishlist</span>
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleLogout}
@@ -189,6 +216,20 @@ const Navbar = () => {
 
         {/* Mobile Action Buttons & Hamburger Menu */}
         <div className="flex items-center gap-2 md:hidden">
+          {/* Wishlist Icon on mobile */}
+          <Link
+            href="/user/wishlist"
+            className="relative p-2.5 text-muted-foreground hover:text-primary transition-all rounded-full hover:bg-muted active:scale-95"
+            aria-label="View Wishlist"
+          >
+            <Heart className="h-5 w-5" />
+            {mounted && token && wishlistCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-[10px] font-extrabold text-white animate-in zoom-in duration-200">
+                {wishlistCount}
+              </span>
+            )}
+          </Link>
+
           {/* Cart Icon on mobile next to hamburger */}
           <Link
             href="/cart"

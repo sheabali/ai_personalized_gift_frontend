@@ -1,15 +1,11 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Gift, ShoppingCart, Star, Heart, Sparkles } from "lucide-react";
+import { Heart, Sparkles } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-
-import { useAppDispatch } from "@/redux/hooks";
-import { addToCart } from "@/redux/features/cartSlice";
 import { useGetMyWishlistQuery, useToggleWishlistMutation } from "@/redux/api/wishlistApi";
 import { toast } from "sonner";
 import { useAppSelector } from "@/redux/hooks";
@@ -20,9 +16,8 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, aiDesignId }: ProductCardProps) {
-  const dispatch = useAppDispatch();
   const { user } = useAppSelector((state) => state.auth);
-  const { id, name, price, discountPrice, thumbnail, category, isAiEnabled, stock } = product;
+  const { id, name, price, discountPrice, thumbnail, isAiEnabled, stock } = product;
 
   const { data: wishlistData } = useGetMyWishlistQuery(undefined, {
     skip: !user,
@@ -46,116 +41,91 @@ export default function ProductCard({ product, aiDesignId }: ProductCardProps) {
     }
   };
 
-  const handleAddToCart = () => {
-    dispatch(addToCart({
-      id: `${id}-no-ai`,
-      productId: id,
-      name,
-      thumbnail,
-      category,
-      price: discountPrice || price,
-      quantity: 1,
-      aiDesignId: null,
-      aiDesign: null
-    }));
-    toast.success(`${name} added to cart!`);
-  };
-
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      transition={{ duration: 0.3 }}
-      className="group"
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.2 }}
+      className="group flex flex-col space-y-3"
     >
-      <Card className="relative overflow-hidden rounded-3xl border-neutral-100 bg-white shadow-sm hover:shadow-xl transition-all duration-300">
+      {/* Image Container */}
+      <div className="relative aspect-[4/5] overflow-hidden rounded-xl bg-neutral-50 shadow-sm border border-neutral-100/50">
         {/* Badges */}
-        <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
+        <div className="absolute top-4 left-4 z-10 flex flex-col gap-1.5">
           {isAiEnabled && (
-            <Badge className="bg-primary hover:bg-primary text-white border-none px-3 py-1 rounded-full flex items-center gap-1">
+            <Badge className="bg-primary/90 hover:bg-primary text-white border-none px-3 py-1 rounded-full flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider">
               <Sparkles className="w-3 h-3" />
               AI Enabled
             </Badge>
           )}
-          {discountPrice && (
-            <Badge className="bg-red-500 hover:bg-red-500 text-white border-none px-3 py-1 rounded-full">
+          {discountPrice && discountPrice < price && (
+            <Badge className="bg-red-500/90 hover:bg-red-500 text-white border-none px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
               Sale
             </Badge>
           )}
         </div>
 
         {/* Favorite Button */}
-        <button 
-          onClick={handleToggleWishlist}
-          className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all shadow-sm ${
-            isWishlisted 
-              ? 'bg-red-50 text-red-500 hover:bg-red-100' 
-              : 'bg-white/80 backdrop-blur-md text-neutral-400 hover:text-red-500 hover:bg-white'
-          }`}
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            handleToggleWishlist();
+          }}
+          className={`absolute top-4 right-4 z-10 p-2 rounded-full transition-all shadow-sm ${isWishlisted
+            ? 'bg-red-50 text-red-500 hover:bg-red-100'
+            : 'bg-white/80 backdrop-blur-md text-neutral-400 hover:text-red-500 hover:bg-white'
+            }`}
         >
-          <Heart className={`w-5 h-5 ${isWishlisted ? 'fill-current' : ''}`} />
+          <Heart className={`w-4 h-4 ${isWishlisted ? 'fill-current' : ''}`} />
         </button>
 
-        {/* Image Section */}
-        <Link href={`/products/${id}${aiDesignId ? `?aiDesignId=${aiDesignId}` : ""}`}>
-          <div className="relative aspect-[4/5] overflow-hidden">
-            <Image
-              src={thumbnail || "/images/placeholder-product.jpg"}
-              alt={name}
-              fill
-              className="object-cover transition-transform duration-500 group-hover:scale-110"
-            />
-            {stock === 0 && (
-              <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
-                <span className="text-white font-bold tracking-widest uppercase">Out of Stock</span>
-              </div>
-            )}
-          </div>
+        {/* Image link */}
+        <Link href={`/products/${id}${aiDesignId ? `?aiDesignId=${aiDesignId}` : ""}`} className="block w-full h-full">
+          <Image
+            src={thumbnail || "/images/placeholder-product.jpg"}
+            alt={name}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+          {stock === 0 && (
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center">
+              <span className="text-white font-bold tracking-widest uppercase text-xs">Out of Stock</span>
+            </div>
+          )}
+        </Link>
+      </div>
+
+      {/* Info Section */}
+      <div className="flex flex-col space-y-1 px-1">
+        <Link href={`/products/${id}${aiDesignId ? `?aiDesignId=${aiDesignId}` : ""}`} className="block">
+          <h3 className="text-sm font-medium text-neutral-900 group-hover:text-primary transition-colors duration-200 line-clamp-2 leading-relaxed tracking-tight">
+            {name}
+          </h3>
         </Link>
 
-        {/* Content Section */}
-        <CardContent className="p-5 space-y-2">
-          <p className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
-            {category}
-          </p>
-          <Link href={`/products/${id}${aiDesignId ? `?aiDesignId=${aiDesignId}` : ""}`}>
-            <h3 className="text-lg font-bold text-neutral-900 group-hover:text-primary transition-colors line-clamp-1">
-              {name}
-            </h3>
-          </Link>
-
-          <div className="flex items-center gap-1 text-yellow-400">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-3 h-3 fill-current" />
-            ))}
-            <span className="text-xs text-neutral-400 ml-1">(4.8)</span>
-          </div>
-
-          <div className="flex items-end gap-2">
-            <span className="text-lg font-bold text-neutral-900">
-              ৳{discountPrice || price}
+        <div className="flex items-center gap-2 pt-0.5">
+          <span className="text-md font-bold text-neutral-900">
+            Tk {(discountPrice || price).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </span>
+          {discountPrice && discountPrice < price && (
+            <span className="text-xs text-neutral-400 line-through">
+              Tk {price.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </span>
-            {discountPrice && (
-              <span className="text-sm text-neutral-400 line-through mb-0.5">
-                ৳{price}
-              </span>
-            )}
-          </div>
-        </CardContent>
+          )}
+        </div>
+      </div>
 
-        <CardFooter className="p-5 pt-0">
+      {/* Action Button */}
+      <div className="pt-2">
+        <Link href={`/products/${id}${aiDesignId ? `?aiDesignId=${aiDesignId}` : ""}`} className="block w-full">
           <Button
-            onClick={(e) => {
-              e.preventDefault();
-              handleAddToCart();
-            }}
-            className="w-full rounded-xl bg-neutral-900 hover:bg-primary text-white transition-all group-hover:shadow-lg gap-2"
+            variant="outline"
+            className="w-full h-12 rounded-none border border-black bg-white hover:bg-black text-black hover:text-white transition-all duration-300 font-medium text-sm"
             disabled={stock === 0}
           >
-            <ShoppingCart className="w-4 h-4" />
-            Add to Cart
+            Choose options
           </Button>
-        </CardFooter>
-      </Card>
+        </Link>
+      </div>
     </motion.div>
   );
 }

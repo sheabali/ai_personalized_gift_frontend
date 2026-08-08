@@ -1,5 +1,7 @@
 import { MetadataRoute } from 'next';
 
+export const revalidate = 3600; // Revalidate sitemap every hour
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
   const apiUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:8000/api/v1';
@@ -7,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Fetch all products
   let products: any[] = [];
   try {
-    const res = await fetch(`${apiUrl}/products`, { cache: 'no-store' });
+    const res = await fetch(`${apiUrl}/products`, { next: { revalidate: 3600 } });
     const data = await res.json();
     if (data.success) {
       products = data.data.data || data.data || [];

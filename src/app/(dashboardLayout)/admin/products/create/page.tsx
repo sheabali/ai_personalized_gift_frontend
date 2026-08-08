@@ -1,4 +1,4 @@
-import ProductForm from "@/components/module/Admin/ProductForm";
+import ProductForm from "@/components/module/Admin/Products/ProductForm";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

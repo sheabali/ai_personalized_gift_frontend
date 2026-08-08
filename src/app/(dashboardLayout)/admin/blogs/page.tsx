@@ -23,17 +23,17 @@ import { BlogFormDialog } from "@/components/module/blogs/BlogFormDialog";
 import { DeleteAlertDialog } from "@/components/module/blogs/DeleteAlertDialog";
 
 export default function AdminBlogsPage() {
-  // ── List state ─────────────────────────────────────────────────────────────
+  // List state
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [page, setPage] = useState(1);
 
-  // ── Dialog state ───────────────────────────────────────────────────────────
+  // Dialog state
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editPost, setEditPost] = useState<BlogPost | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<BlogPost | null>(null);
 
-  // ── API ────────────────────────────────────────────────────────────────────
+  // API
   const { data: response, isLoading, isError } = useGetAllBlogPostsQuery({
     search: search || undefined,
     isPublished:
@@ -49,7 +49,7 @@ export default function AdminBlogsPage() {
   const [updateBlogPost, { isLoading: isUpdating }] = useUpdateBlogPostMutation();
   const [deleteBlogPost, { isLoading: isDeleting }] = useDeleteBlogPostMutation();
 
-  // ── Handlers ───────────────────────────────────────────────────────────────
+  // Handlers  
 
   const handleOpenCreate = () => {
     setEditPost(null);
@@ -125,7 +125,7 @@ export default function AdminBlogsPage() {
     }
   };
 
-  // ── Render ─────────────────────────────────────────────────────────────────
+  // Render 
 
   return (
     <div className="space-y-8 max-w-7xl mx-auto px-4 py-8">
